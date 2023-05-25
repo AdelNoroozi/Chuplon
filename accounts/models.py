@@ -34,6 +34,7 @@ class UserManager(BaseUserManager):
             password=password
         )
         customer.role = 'CUS'
+        customer.email = username
         customer.save(using=self._db)
         Customer.objects.create(base_user=customer)
         return customer
@@ -90,6 +91,12 @@ class BaseUser(AbstractUser):
     objects = UserManager()
 
     def __str__(self):
+        if self.is_superuser:
+            self.role = 'SPU'
+            self.save()
+        elif self.is_staff:
+            self.role = 'STF'
+            self.save()
         return f'{self.username} - {self.role}'
 
     class Meta:
