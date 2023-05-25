@@ -43,10 +43,14 @@ class UserManager(BaseUserManager):
         Customer.objects.create(base_user=customer)
         return customer
 
-    def create_print_provider(self, username, password):
+    def create_print_provider(self, username, password, email, phone_number, first_name=None, last_name=None):
         print_provider = self.create_user(
             username=username,
-            password=password
+            password=password,
+            email=email,
+            phone_number=phone_number,
+            first_name=first_name,
+            last_name=last_name,
         )
         print_provider.role = 'PRP'
         print_provider.save(using=self._db)

@@ -80,3 +80,9 @@ class AdminViewSet(mixins.ListModelMixin,
             return AdminMiniSerializer
         else:
             return AdminSerializer
+
+
+class AddProviderView(CreateAPIView):
+    queryset = BaseUser.objects.all()
+    serializer_class = AddProviderSerializer
+    permission_classes = (IsSuperUser,)
