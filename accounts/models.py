@@ -180,12 +180,6 @@ class Store(models.Model):
         upload_to='images/',
         default='images/default.png'
     )
-    alt_text = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True,
-        verbose_name='avatar alternative text',
-    )
     custom_url = models.CharField(max_length=100, verbose_name=_('custom url'))
 
     def __str__(self):

@@ -1,4 +1,4 @@
-from rest_framework import mixins, status
+from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import CreateAPIView, UpdateAPIView
@@ -120,3 +120,37 @@ class DesignerViewSet(mixins.ListModelMixin,
             return DesignerMiniSerializer
         else:
             return DesignerSerializer
+
+    @action(detail=True, methods=['PATCH'])
+    def promote_to_premium(self, request, pk=None):
+        if not Designer.objects.filter(id=pk).exists():
+            response = {'message': 'designer not found'}
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+        designer = Designer.objects.get(id=pk)
+        if designer.is_premium:
+            response = {'message': 'designer account is already premium'}
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+        designer.is_premium = True
+        designer.save()
+        # some stuff happens here
+        response = {'message': 'designer promoted successfully'}
+        return Response(response, status=status.HTTP_200_OK)
+
+
+class StoreViewSet(viewsets.ModelViewSet):
+    queryset = Store.objects.all()
+
+    def get_queryset(self):
+        designer_id = self.kwargs.get('designer_pk')
+        designer_stores = Store.objects.filter(designer_id=designer_id)
+        return designer_stores
+
+    def get_serializer_class(self):
+        if self.action == 'update' or self.action == 'create':
+            return SaveStoreSerializer
+        else:
+            return StoreSerializer
+
+    def get_serializer_context(self):
+        return {'designer_id': self.kwargs.get('designer_pk'),
+                'store_id': self.kwargs.get('pk')}

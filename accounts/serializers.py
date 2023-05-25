@@ -4,7 +4,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.validators import EmailValidator
 from rest_framework import serializers
 
-from accounts.models import BaseUser, Customer, Admin, PrintProvider, Designer
+from accounts.models import BaseUser, Customer, Admin, PrintProvider, Designer, Store
 
 
 class BaseUserSerializer(serializers.ModelSerializer):
@@ -153,3 +153,37 @@ class DesignerMiniSerializer(AbstractUserTypeMiniSerializer):
     class Meta(AbstractUserTypeMiniSerializer.Meta):
         model = Designer
         fields = ('id', 'customer_object')
+
+
+# store serializers
+class SaveStoreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Store
+        exclude = ('designer',)
+
+    def save(self, **kwargs):
+        designer_id = self.context['designer_id']
+        store_name = self.validated_data['store_name']
+        store_avatar = self.validated_data['store_avatar']
+        custom_url = self.validated_data['custom_url']
+        try:
+            store_id = self.context['store_id']
+            store = Store.objects.get(id=store_id)
+            store.store_name = store_name
+            store.store_avatar = store_avatar
+            store.custom_url = custom_url
+            store.save()
+            self.instance = store
+        except:
+            if not Designer.objects.filter(id=designer_id).exists():
+                raise serializers.ValidationError('designer not found')
+            self.instance = Store.objects.create(designer_id=designer_id, store_name=store_name,
+                                                 store_avatar=store_avatar, custom_url=custom_url)
+
+        return self.instance
+
+
+class StoreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Store
+        exclude = ('designer',)
