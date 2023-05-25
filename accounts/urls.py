@@ -16,9 +16,10 @@ designer_nested_router.register('stores', StoreViewSet, basename='stores')
 urlpatterns = [
     path('', include(router.urls)),
     path('', include(designer_nested_router.urls)),
-    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair_view'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh_view'),
+    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('register/', RegisterCustomerView.as_view(), name='register'),
     path('add-admin/', AddAdminView.as_view(), name='add_admin'),
     path('add-provider/', AddProviderView.as_view(), name='add_admin'),
+    path('get_my_info/', GetUserInfoView.as_view(), name='get_user_info'),
 ]

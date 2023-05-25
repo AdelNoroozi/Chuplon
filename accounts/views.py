@@ -1,8 +1,9 @@
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, AuthenticationFailed
 from rest_framework.generics import CreateAPIView, UpdateAPIView
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 from accounts.models import *
 from accounts.permissons import MappedDjangoModelPermissions, NotAuthenticated, IsSuperUser
@@ -154,3 +155,25 @@ class StoreViewSet(viewsets.ModelViewSet):
     def get_serializer_context(self):
         return {'designer_id': self.kwargs.get('designer_pk'),
                 'store_id': self.kwargs.get('pk')}
+
+
+class GetUserInfoView(APIView):
+    def get(self, request):
+        if not request.user.is_authenticated:
+            raise AuthenticationFailed('not authenticated')
+        user = request.user
+        if user.is_staff:
+            serializer = BaseUserSerializer(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        if user.role == 'CUS':
+            customer = Customer.objects.get(base_user=user)
+            serializer = CustomerSerializer(customer)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        if user.role == 'DES':
+            designer = Designer.objects.get(customer_object__base_user=user)
+            serializer = DesignerSerializer(designer)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        if user.role == 'PRP':
+            provider = PrintProvider.objects.get(base_user=user)
+            serializer = ProviderSerializer(provider)
+            return Response(serializer.data, status=status.HTTP_200_OK)
