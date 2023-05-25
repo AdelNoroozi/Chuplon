@@ -1,6 +1,6 @@
 from rest_framework import mixins, status
 from rest_framework.decorators import action
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, UpdateAPIView
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from accounts.models import *
@@ -17,6 +17,7 @@ class RegisterCustomerView(CreateAPIView):
 class BaseUserViewSet(mixins.ListModelMixin,
                       mixins.RetrieveModelMixin,
                       GenericViewSet):
+    queryset = BaseUser.objects.all()
     permission_classes = (MappedDjangoModelPermissions,)
 
     def get_serializer_class(self):
@@ -24,16 +25,6 @@ class BaseUserViewSet(mixins.ListModelMixin,
             return BaseUserMiniSerializer
         else:
             return BaseUserSerializer
-
-    def get_queryset(self):
-        if self.request.user.is_superuser:
-            return BaseUser.objects.all()
-        elif self.request.user.is_staff:
-            # admin = Admin.objects.get(base_user=self.request.user)
-            # admins section must be checked here too
-            return BaseUser.objects.filter(is_staff=False)
-        else:
-            return BaseUser.objects.none()
 
     @classmethod
     def get_user_by_id(cls, _id):
@@ -63,3 +54,19 @@ class AddAdminView(CreateAPIView):
     queryset = BaseUser.objects.all()
     serializer_class = AddAdminSerializer
     permission_classes = (IsSuperUser,)
+
+
+class CustomerViewSet(mixins.ListModelMixin,
+                      mixins.RetrieveModelMixin,
+                      GenericViewSet):
+    queryset = Customer.objects.all()
+    permission_classes = (MappedDjangoModelPermissions,)
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return CustomerMiniSerializer
+        else:
+            return CustomerSerializer
+
+
+

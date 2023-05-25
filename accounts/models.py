@@ -120,7 +120,7 @@ class BaseUser(AbstractUser):
 class Customer(models.Model):
     base_user = models.OneToOneField(BaseUser, on_delete=models.CASCADE, related_name='customer',
                                      verbose_name=_('base user'))
-    birth_date = models.DateField(blank=True, null=True)
+    birth_date = models.DateField(blank=True, null=True, verbose_name=_('birth date'))
 
     def __str__(self):
         return self.base_user.username
@@ -154,9 +154,9 @@ class Designer(models.Model):
     customer_object = models.OneToOneField(Customer, on_delete=models.CASCADE, related_name='designer',
                                            verbose_name=_('customer object'))
     card_number = models.CharField(max_length=20, validators=[card_number_validator], verbose_name=_('card number'))
-    is_premium = models.BooleanField(default=False)
-    balance = models.FloatField(default=0)
-    promotion_date = models.DateTimeField(auto_now_add=True)
+    is_premium = models.BooleanField(default=False, verbose_name=_('is premium'))
+    balance = models.FloatField(default=0, verbose_name=_('balance'))
+    promotion_date = models.DateTimeField(auto_now_add=True, verbose_name=_('promotion date'))
 
     def __str__(self):
         return self.customer_object.base_user.username

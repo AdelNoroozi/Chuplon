@@ -4,13 +4,13 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.validators import EmailValidator
 from rest_framework import serializers
 
-from accounts.models import BaseUser
+from accounts.models import BaseUser, Customer
 
 
 class BaseUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = BaseUser
-        exclude = ['password']
+        exclude = ('password',)
 
 
 class BaseUserMiniSerializer(serializers.ModelSerializer):
@@ -71,3 +71,19 @@ class AddAdminSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         admin_user = self.Meta.model.objects.create_admin(**self.validated_data)
         return admin_user
+
+
+class CustomerSerializer(serializers.ModelSerializer):
+    base_user = BaseUserSerializer(many=False)
+
+    class Meta:
+        model = Customer
+        fields = '__all__'
+
+
+class CustomerMiniSerializer(serializers.ModelSerializer):
+    base_user = serializers.CharField(source='base_user.username')
+
+    class Meta:
+        model = Customer
+        fields = ('id', 'base_user')
