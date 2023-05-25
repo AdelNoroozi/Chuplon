@@ -1,4 +1,4 @@
-from rest_framework.permissions import DjangoModelPermissions
+from rest_framework.permissions import DjangoModelPermissions, BasePermission
 
 
 class MappedDjangoModelPermissions(DjangoModelPermissions):
@@ -11,3 +11,8 @@ class MappedDjangoModelPermissions(DjangoModelPermissions):
         'PATCH': ['%(app_label)s.change_%(model_name)s'],
         'DELETE': ['%(app_label)s.delete_%(model_name)s'],
     }
+
+
+class NotAuthenticated(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_anonymous
