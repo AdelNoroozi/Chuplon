@@ -10,13 +10,17 @@ from django.utils.translation import gettext_lazy as _
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, username, password=None):
+    def create_user(self, username, password=None, first_name=None, last_name=None, email=None, phone_number=None):
         if not username:
             raise ValueError('username is required')
         if not password:
             raise ValueError('password is required')
         user_obj = self.model(
-            username=username
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            phone_number=phone_number
         )
         user_obj.password = make_password(password)
         user_obj.is_staff = False
@@ -49,15 +53,21 @@ class UserManager(BaseUserManager):
         PrintProvider.objects.create(base_user=print_provider)
         return print_provider
 
-    def create_admin(self, username, password):
+    def create_admin(self, username, password, email, phone_number, first_name, last_name):
         admin = self.create_user(
             username=username,
-            password=password
+            password=password,
+            email=email,
+            phone_number=phone_number,
+            first_name=first_name,
+            last_name=last_name,
         )
         admin.is_staff = True
         admin.role = 'STF'
         admin.save(using=self._db)
-        Admin.objects.create(base_user=admin)
+        admin_object = Admin.objects.create(base_user=admin)
+        admin_object.section = 'UD'
+        admin_object.save(using=self._db)
         return admin
 
     def create_superuser(self, username, password):
@@ -81,6 +91,9 @@ class BaseUser(AbstractUser):
              ('DES', _('designer')),
              ('PRP', _('print provider')))
 
+    first_name = models.CharField(max_length=150, blank=True, null=True, verbose_name=_("first name"))
+    last_name = models.CharField(max_length=150, blank=True, null=True, verbose_name=_("last name"), )
+    email = models.EmailField(blank=True, null=True, verbose_name=_("email address"))
     modified_at = models.DateTimeField(auto_now=True, verbose_name=_('modified at'))
     phone_number = models.CharField(blank=True, null=True, validators=[phone_number_validator], max_length=30)
     role = models.CharField(choices=ROLES, max_length=20, verbose_name=_('role'))

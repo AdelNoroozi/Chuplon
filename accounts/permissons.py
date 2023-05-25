@@ -16,3 +16,8 @@ class MappedDjangoModelPermissions(DjangoModelPermissions):
 class NotAuthenticated(BasePermission):
     def has_permission(self, request, view):
         return request.user.is_anonymous
+
+
+class IsSuperUser(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_superuser

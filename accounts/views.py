@@ -4,7 +4,7 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from accounts.models import *
-from accounts.permissons import MappedDjangoModelPermissions, NotAuthenticated
+from accounts.permissons import MappedDjangoModelPermissions, NotAuthenticated, IsSuperUser
 from accounts.serializers import *
 
 
@@ -57,3 +57,9 @@ class BaseUserViewSet(mixins.ListModelMixin,
         else:
             response_message = 'Account deactivated successfully.'
         return Response({'message': response_message}, status=status.HTTP_200_OK)
+
+
+class AddAdminView(CreateAPIView):
+    queryset = BaseUser.objects.all()
+    serializer_class = AddAdminSerializer
+    permission_classes = (IsSuperUser,)
