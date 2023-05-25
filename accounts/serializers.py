@@ -4,7 +4,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.validators import EmailValidator
 from rest_framework import serializers
 
-from accounts.models import BaseUser, Customer, Admin, PrintProvider
+from accounts.models import BaseUser, Customer, Admin, PrintProvider, Designer
 
 
 class BaseUserSerializer(serializers.ModelSerializer):
@@ -137,3 +137,19 @@ class ProviderMiniSerializer(AbstractUserTypeMiniSerializer):
         model = PrintProvider
         fields = ('id', 'base_user', 'name')
 
+
+# designer serializers
+class DesignerSerializer(AbstractUserTypeSerializer):
+    base_user = None
+    customer_object = CustomerSerializer(many=False)
+
+    class Meta(AbstractUserTypeSerializer.Meta):
+        model = Designer
+
+
+class DesignerMiniSerializer(AbstractUserTypeMiniSerializer):
+    customer_object = serializers.CharField(source='customer_object.base_user.username')
+
+    class Meta(AbstractUserTypeMiniSerializer.Meta):
+        model = Designer
+        fields = ('id', 'customer_object')

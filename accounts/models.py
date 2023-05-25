@@ -153,7 +153,7 @@ class AccountVerification(models.Model):
 
 
 class Designer(models.Model):
-    card_number_validator = RegexValidator(regex=r'd{16}$')
+    card_number_validator = RegexValidator(regex=r'\d{16}$')
 
     customer_object = models.OneToOneField(Customer, on_delete=models.CASCADE, related_name='designer',
                                            verbose_name=_('customer object'))

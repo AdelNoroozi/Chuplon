@@ -107,3 +107,16 @@ class ProviderViewSet(mixins.ListModelMixin,
             return ProviderMiniSerializer
         else:
             return ProviderSerializer
+
+
+class DesignerViewSet(mixins.ListModelMixin,
+                      mixins.RetrieveModelMixin,
+                      GenericViewSet):
+    queryset = Designer.objects.all()
+    permission_classes = (MappedDjangoModelPermissions,)
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return DesignerMiniSerializer
+        else:
+            return DesignerSerializer
