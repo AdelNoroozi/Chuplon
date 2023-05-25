@@ -1,5 +1,6 @@
 from rest_framework import mixins, status
 from rest_framework.decorators import action
+from rest_framework.exceptions import NotFound
 from rest_framework.generics import CreateAPIView, UpdateAPIView
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -17,8 +18,15 @@ class RegisterCustomerView(CreateAPIView):
 class BaseUserViewSet(mixins.ListModelMixin,
                       mixins.RetrieveModelMixin,
                       GenericViewSet):
-    queryset = BaseUser.objects.all()
     permission_classes = (MappedDjangoModelPermissions,)
+
+    def get_queryset(self):
+        if self.request.user.is_superuser:
+            return BaseUser.objects.all()
+        elif self.request.user.is_staff:
+            return BaseUser.objects.filter(is_staff=False).exclude(role='PRP')
+        else:
+            return BaseUser.objects.none()
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -36,11 +44,10 @@ class BaseUserViewSet(mixins.ListModelMixin,
         user = BaseUserViewSet.get_user_by_id(_id=pk)
         if not user:
             return Response({'message': "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        if user not in self.get_queryset():
+            raise NotFound("detail not found.")
         if user.is_superuser:
             return Response({'message': 'Cannot perform this action on a superuser'}, status=status.HTTP_403_FORBIDDEN)
-        # if user.is_staff and not request.user.is_superuser:
-        #     return Response({'message': 'Only superusers can change the status of staff users'},
-        #                     status=status.HTTP_403_FORBIDDEN)
         user.is_active = not user.is_active
         user.save()
         if user.is_active:
