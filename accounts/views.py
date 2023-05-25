@@ -69,4 +69,14 @@ class CustomerViewSet(mixins.ListModelMixin,
             return CustomerSerializer
 
 
+class AdminViewSet(mixins.ListModelMixin,
+                   mixins.RetrieveModelMixin,
+                   GenericViewSet):
+    queryset = Admin.objects.all()
+    permission_classes = (IsSuperUser,)
 
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return AdminMiniSerializer
+        else:
+            return AdminSerializer

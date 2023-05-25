@@ -4,7 +4,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.validators import EmailValidator
 from rest_framework import serializers
 
-from accounts.models import BaseUser, Customer
+from accounts.models import BaseUser, Customer, Admin
 
 
 class BaseUserSerializer(serializers.ModelSerializer):
@@ -13,10 +13,25 @@ class BaseUserSerializer(serializers.ModelSerializer):
         exclude = ('password',)
 
 
+class AbstractUserTypeSerializer(serializers.ModelSerializer):
+    base_user = BaseUserSerializer(many=False)
+
+    class Meta:
+        fields = '__all__'
+
+
 class BaseUserMiniSerializer(serializers.ModelSerializer):
     class Meta:
         model = BaseUser
         fields = ('id', 'username', 'role')
+
+
+class AbstractUserTypeMiniSerializer(serializers.ModelSerializer):
+    base_user = serializers.CharField(source='base_user.username')
+
+    class Meta:
+        model = Customer
+        fields = ('id', 'base_user')
 
 
 class RegisterCustomerSerializer(serializers.ModelSerializer):
@@ -73,15 +88,27 @@ class AddAdminSerializer(serializers.ModelSerializer):
         return admin_user
 
 
-class CustomerSerializer(serializers.ModelSerializer):
-    base_user = BaseUserSerializer(many=False)
-
-    class Meta:
+class CustomerSerializer(AbstractUserTypeSerializer):
+    class Meta(AbstractUserTypeSerializer.Meta):
         model = Customer
         fields = '__all__'
 
 
 class CustomerMiniSerializer(serializers.ModelSerializer):
+    base_user = serializers.CharField(source='base_user.username')
+
+    class Meta:
+        model = Customer
+        fields = ('id', 'base_user')
+
+
+class AdminSerializer(AbstractUserTypeSerializer):
+    class Meta(AbstractUserTypeSerializer.Meta):
+        model = Admin
+        fields = '__all__'
+
+
+class AdminMiniSerializer(serializers.ModelSerializer):
     base_user = serializers.CharField(source='base_user.username')
 
     class Meta:
