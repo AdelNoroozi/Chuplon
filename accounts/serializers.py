@@ -27,13 +27,12 @@ class BaseUserMiniSerializer(serializers.ModelSerializer):
 
 
 class AbstractUserTypeMiniSerializer(serializers.ModelSerializer):
-    base_user = serializers.CharField(source='base_user.username')
-
     class Meta:
         model = Customer
         fields = ('id', 'base_user')
 
 
+# customer serializers
 class RegisterCustomerSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
 
@@ -57,6 +56,19 @@ class RegisterCustomerSerializer(serializers.ModelSerializer):
         return customer_user
 
 
+class CustomerSerializer(AbstractUserTypeSerializer):
+    class Meta(AbstractUserTypeSerializer.Meta):
+        model = Customer
+
+
+class CustomerMiniSerializer(AbstractUserTypeMiniSerializer):
+    base_user = serializers.CharField(source='base_user.username')
+
+    class Meta(AbstractUserTypeMiniSerializer.Meta):
+        model = Customer
+
+
+# admin serializers
 class AddAdminSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True)
     first_name = serializers.CharField(required=True)
@@ -88,29 +100,61 @@ class AddAdminSerializer(serializers.ModelSerializer):
         return admin_user
 
 
-class CustomerSerializer(AbstractUserTypeSerializer):
-    class Meta(AbstractUserTypeSerializer.Meta):
-        model = Customer
-        fields = '__all__'
-
-
-class CustomerMiniSerializer(serializers.ModelSerializer):
-    base_user = serializers.CharField(source='base_user.username')
-
-    class Meta:
-        model = Customer
-        fields = ('id', 'base_user')
-
-
 class AdminSerializer(AbstractUserTypeSerializer):
     class Meta(AbstractUserTypeSerializer.Meta):
         model = Admin
-        fields = '__all__'
 
 
-class AdminMiniSerializer(serializers.ModelSerializer):
-    base_user = serializers.CharField(source='base_user.username')
+class AdminMiniSerializer(AbstractUserTypeMiniSerializer):
+    base_user = serializers.SerializerMethodField(method_name='get_admin_name')
 
-    class Meta:
-        model = Customer
-        fields = ('id', 'base_user')
+    class Meta(AbstractUserTypeMiniSerializer.Meta):
+        model = Admin
+
+    def get_admin_name(self, admin: Admin):
+        return f'{admin.base_user.first_name} {admin.base_user.last_name}'
+
+# admin serializers
+# class AddProviderSerializer(serializers.ModelSerializer):
+#     email = serializers.EmailField(required=True)
+#     first_name = serializers.CharField(required=True)
+#     last_name = serializers.CharField(required=True)
+#     phone_number = serializers.CharField(required=True)
+#     password = serializers.CharField(write_only=True, required=True)
+#
+#     class Meta:
+#         model = BaseUser
+#         fields = ('username', 'password', 'email', 'phone_number', 'first_name', 'last_name')
+#
+#     def validate(self, attrs):
+#         email_validator = EmailValidator()
+#         email = attrs.get('email')
+#         if email:
+#             email_validator(email)
+#         phone_number_pattern = re.compile(r'^(09)\d{9}$')
+#         phone_number = attrs.get('phone_number')
+#         if phone_number:
+#             if not phone_number_pattern.match(phone_number):
+#                 raise serializers.ValidationError('invalid phone number')
+#         password = attrs.get('password')
+#         if password:
+#             validate_password(password)
+#         return attrs
+#
+#     def create(self, validated_data):
+#         admin_user = self.Meta.model.objects.create_admin(**self.validated_data)
+#         return admin_user
+#
+#
+# class AdminSerializer(AbstractUserTypeSerializer):
+#     class Meta(AbstractUserTypeSerializer.Meta):
+#         model = Admin
+#         fields = '__all__'
+#
+#
+# class AdminMiniSerializer(serializers.ModelSerializer):
+#     base_user = serializers.CharField(source='base_user.username')
+#
+#     class Meta:
+#         model = Customer
+#         fields = ('id', 'base_user')
