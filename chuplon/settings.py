@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "mptt",
     "drf_spectacular",
+    "django_filters",
 
     "accounts",
     "checkout",
@@ -91,7 +92,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
         'USER': 'root',
-        'PASSWORD': 'Y527iw1iezWG9X5tOlQhqjFH',
+        'PASSWORD': '',
         'HOST': 'luca.iran.liara.ir',
         'PORT': '32879',
     }

@@ -1,10 +1,14 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound, AuthenticationFailed
+from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.generics import CreateAPIView, UpdateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
+
+from accounts.filters import BaseUserFilter, AdminFilter, DesignerFilter
 from accounts.models import *
 from accounts.permissons import MappedDjangoModelPermissions, NotAuthenticated, IsSuperUser
 from accounts.serializers import *
@@ -19,7 +23,12 @@ class RegisterCustomerView(CreateAPIView):
 class BaseUserViewSet(mixins.ListModelMixin,
                       mixins.RetrieveModelMixin,
                       GenericViewSet):
-    permission_classes = (MappedDjangoModelPermissions,)
+    # permission_classes = (MappedDjangoModelPermissions,)
+
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_class = BaseUserFilter
+    search_fields = ['phone_number', 'first_name', 'last_name', 'username', 'email', ]
+    ordering_fields = ['date_joined']
 
     def get_queryset(self):
         if self.request.user.is_superuser:
@@ -84,6 +93,8 @@ class AdminViewSet(mixins.ListModelMixin,
                    mixins.RetrieveModelMixin,
                    GenericViewSet):
     queryset = Admin.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = AdminFilter
     permission_classes = (IsSuperUser,)
 
     def get_serializer_class(self):
@@ -101,6 +112,7 @@ class ProviderViewSet(mixins.ListModelMixin,
                       mixins.RetrieveModelMixin,
                       GenericViewSet):
     queryset = PrintProvider.objects.all()
+    # filters
     permission_classes = (MappedDjangoModelPermissions,)
 
     def get_serializer_class(self):
@@ -114,6 +126,9 @@ class DesignerViewSet(mixins.ListModelMixin,
                       mixins.RetrieveModelMixin,
                       GenericViewSet):
     queryset = Designer.objects.all()
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_class = DesignerFilter
+    ordering_fields = ['promotion_date', 'balance']
     permission_classes = (MappedDjangoModelPermissions,)
 
     def get_serializer_class(self):
@@ -140,6 +155,10 @@ class DesignerViewSet(mixins.ListModelMixin,
 
 class StoreViewSet(viewsets.ModelViewSet):
     queryset = Store.objects.all()
+    filter_backends = [SearchFilter, ]
+    search_fields = ['store_name', ]
+
+    # permission
 
     def get_queryset(self):
         designer_id = self.kwargs.get('designer_pk')
