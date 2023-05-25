@@ -50,10 +50,13 @@ class BaseUserViewSet(mixins.ListModelMixin,
         return Response({'message': response_message}, status=status.HTTP_200_OK)
 
 
-class AddAdminView(CreateAPIView):
+class AbstractAddUserTypeView(CreateAPIView):
     queryset = BaseUser.objects.all()
-    serializer_class = AddAdminSerializer
     permission_classes = (IsSuperUser,)
+
+
+class AddAdminView(AbstractAddUserTypeView):
+    serializer_class = AddAdminSerializer
 
 
 class CustomerViewSet(mixins.ListModelMixin,
@@ -82,7 +85,18 @@ class AdminViewSet(mixins.ListModelMixin,
             return AdminSerializer
 
 
-class AddProviderView(CreateAPIView):
-    queryset = BaseUser.objects.all()
+class AddProviderView(AbstractAddUserTypeView):
     serializer_class = AddProviderSerializer
-    permission_classes = (IsSuperUser,)
+
+
+class ProviderViewSet(mixins.ListModelMixin,
+                      mixins.RetrieveModelMixin,
+                      GenericViewSet):
+    queryset = PrintProvider.objects.all()
+    permission_classes = (MappedDjangoModelPermissions,)
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return ProviderMiniSerializer
+        else:
+            return ProviderSerializer
