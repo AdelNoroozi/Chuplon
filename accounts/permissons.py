@@ -25,6 +25,11 @@ class IsAuthenticated(BasePermission):
         return request.user.is_authenticated
 
 
+class IsCustomer(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.role == 'CUS'
+
+
 class IsSuperUser(BasePermission):
     def has_permission(self, request, view):
         return request.user.is_superuser

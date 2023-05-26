@@ -23,4 +23,5 @@ urlpatterns = [
     path('add-provider/', AddProviderView.as_view(), name='add_admin'),
     path('get_my_info/', GetUserInfoView.as_view(), name='get_user_info'),
     path('change_password/', ChangePasswordView.as_view(), name='change_password'),
+    path('promote_to_designer/', promote_customer_to_designer, name='promote_to_designer'),
 ]

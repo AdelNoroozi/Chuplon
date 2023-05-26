@@ -1,17 +1,18 @@
+from django.db import transaction
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, status, viewsets
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.exceptions import NotFound, AuthenticationFailed
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.generics import CreateAPIView, UpdateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
-
+from django.shortcuts import get_object_or_404
 from accounts.filters import BaseUserFilter, AdminFilter, DesignerFilter, ProviderFilter
 from accounts.models import *
 from accounts.permissons import MappedDjangoModelPermissions, NotAuthenticated, IsSuperUser, StorePermission, \
-    IsAuthenticated
+    IsAuthenticated, IsCustomer
 from accounts.serializers import *
 
 
@@ -24,7 +25,7 @@ class RegisterCustomerView(CreateAPIView):
 class BaseUserViewSet(mixins.ListModelMixin,
                       mixins.RetrieveModelMixin,
                       GenericViewSet):
-    # permission_classes = (MappedDjangoModelPermissions,)
+    permission_classes = (MappedDjangoModelPermissions,)
 
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = BaseUserFilter
@@ -52,13 +53,9 @@ class BaseUserViewSet(mixins.ListModelMixin,
 
     @action(detail=True, methods=['PATCH'])
     def change_activation_status(self, request, pk=None):
-        user = BaseUserViewSet.get_user_by_id(_id=pk)
+        user = self.get_queryset().filter(id=pk).first()
         if not user:
             return Response({'message': "User not found"}, status=status.HTTP_404_NOT_FOUND)
-        if user not in self.get_queryset():
-            raise NotFound("detail not found.")
-        if user.is_superuser:
-            return Response({'message': 'Cannot perform this action on a superuser'}, status=status.HTTP_403_FORBIDDEN)
         user.is_active = not user.is_active
         user.save()
         if user.is_active:
@@ -143,10 +140,7 @@ class DesignerViewSet(mixins.ListModelMixin,
 
     @action(detail=True, methods=['PATCH'])
     def promote_to_premium(self, request, pk=None):
-        if not Designer.objects.filter(id=pk).exists():
-            response = {'message': 'designer not found'}
-            return Response(response, status=status.HTTP_404_NOT_FOUND)
-        designer = Designer.objects.get(id=pk)
+        designer = get_object_or_404(Designer, id=pk)
         if designer.is_premium:
             response = {'message': 'designer account is already premium'}
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
@@ -208,3 +202,19 @@ class ChangePasswordView(UpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+@api_view(['POST', ], )
+@transaction.atomic
+@permission_classes([IsCustomer])
+def promote_customer_to_designer(request):
+    user = request.user
+    card_number = request.data.get('card_number')
+    if card_number is None:
+        response = {'missing field': 'card number'}
+        return Response(response, status=status.HTTP_400_BAD_REQUEST)
+    user.role = 'DES'
+    user.save()
+    designer = Designer.objects.create(card_number=card_number, customer_object=Customer.objects.get(base_user=user))
+    serializer = DesignerSerializer(designer)
+    return Response(serializer.data, status=status.HTTP_200_OK)
