@@ -225,4 +225,27 @@ class PrintProvider(models.Model):
         verbose_name = _('Print Provider')
         verbose_name_plural = _('Print Providers')
 
-# Address
+
+class Address(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.RESTRICT, related_name='addresses',
+                                 verbose_name=_('customer'))
+    city = models.ForeignKey(City, on_delete=models.RESTRICT, related_name='addresses', verbose_name=_('city'))
+    detail = models.TextField(max_length=500, verbose_name=_('detail'))
+    post_code = models.CharField(max_length=20, verbose_name=_('post code'))
+    phone_number = models.CharField(max_length=200, verbose_name=_('phone number'))
+    is_default = models.BooleanField(default=False, verbose_name=_('is default'))
+
+    def save(self, *args, **kwargs):
+        if self.is_default:
+            Address.objects.filter(customer=self.customer).exclude(id=self.id).update(is_default=False)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f'{self.customer} - {self.city}'
+
+    def get_address_as_str(self):
+        return f'{self.city} - {self.detail} | post code: {self.post_code} | phone number: {self.phone_number}'
+
+    class Meta:
+        verbose_name = _('Address')
+        verbose_name_plural = _('Addresses')

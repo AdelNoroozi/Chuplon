@@ -9,10 +9,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 from django.shortcuts import get_object_or_404
-from accounts.filters import BaseUserFilter, AdminFilter, DesignerFilter, ProviderFilter
+from accounts.filters import BaseUserFilter, AdminFilter, DesignerFilter, ProviderFilter, AddressFilter, StoreFilter
 from accounts.models import *
 from accounts.permissons import MappedDjangoModelPermissions, NotAuthenticated, IsSuperUser, StorePermission, \
-    IsAuthenticated, IsCustomer
+    IsAuthenticated, IsCustomer, AddressPermission
 from accounts.serializers import *
 
 
@@ -151,10 +151,19 @@ class DesignerViewSet(mixins.ListModelMixin,
         return Response(response, status=status.HTTP_200_OK)
 
 
-class StoreViewSet(viewsets.ModelViewSet):
+class StoreManagerView(mixins.ListModelMixin,
+                       mixins.RetrieveModelMixin,
+                       GenericViewSet):
     queryset = Store.objects.all()
-    filter_backends = [SearchFilter, ]
+    serializer_class = StoreSerializer
+    filter_backends = [SearchFilter, DjangoFilterBackend]
+    filterset_class = StoreFilter
     search_fields = ['store_name', ]
+    permission_classes = (MappedDjangoModelPermissions,)
+
+
+class StoreViewSet(StoreManagerView, mixins.UpdateModelMixin,
+                   mixins.DestroyModelMixin, mixins.CreateModelMixin):
     permission_classes = (StorePermission,)
 
     def get_queryset(self):
@@ -169,7 +178,7 @@ class StoreViewSet(viewsets.ModelViewSet):
             return StoreSerializer
 
     def get_serializer_context(self):
-        return {'designer_id': self.kwargs.get('designer_pk'),
+        return {'request': self.request,
                 'store_id': self.kwargs.get('pk')}
 
 
@@ -202,6 +211,37 @@ class ChangePasswordView(UpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class AddressManagerView(mixins.ListModelMixin,
+                         mixins.RetrieveModelMixin,
+                         GenericViewSet):
+    queryset = Address.objects.all()
+    serializer_class = AddressSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, ]
+    filterset_class = AddressFilter
+    search_fields = ['detail', 'phone_number']
+    permission_classes = (MappedDjangoModelPermissions,)
+
+
+class AddressViewSet(AddressManagerView, mixins.UpdateModelMixin,
+                     mixins.DestroyModelMixin, mixins.CreateModelMixin):
+    permission_classes = (AddressPermission,)
+
+    def get_queryset(self):
+        customer_id = self.kwargs.get('customer_pk')
+        customer_addresses = Address.objects.filter(customer_id=customer_id)
+        return customer_addresses
+
+    def get_serializer_class(self):
+        if self.action == 'update' or self.action == 'create':
+            return SaveAddressSerializer
+        else:
+            return AddressSerializer
+
+    def get_serializer_context(self):
+        return {'request': self.request,
+                'address_id': self.kwargs.get('pk')}
 
 
 @api_view(['POST', ], )

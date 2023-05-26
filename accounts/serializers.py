@@ -3,10 +3,10 @@ import re
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.password_validation import validate_password
 from django.core.validators import EmailValidator
-from rest_framework import serializers, status
-from rest_framework.response import Response
+from rest_framework import serializers
+from rest_framework.generics import get_object_or_404
 
-from accounts.models import BaseUser, Customer, Admin, PrintProvider, Designer, Store
+from accounts.models import BaseUser, Customer, Admin, PrintProvider, Designer, Store, Address
 
 
 class BaseUserSerializer(serializers.ModelSerializer):
@@ -164,19 +164,19 @@ class SaveStoreSerializer(serializers.ModelSerializer):
         exclude = ('designer',)
 
     def save(self, **kwargs):
-        designer_id = self.context['designer_id']
+        designer_id = get_object_or_404(Designer, customer_object__base_user=self.context['request'].user).id
         store_name = self.validated_data.get('store_name')
         store_avatar = self.validated_data.get('store_avatar')
         custom_url = self.validated_data.get('custom_url')
-        try:
-            store_id = self.context['store_id']
-            store = Store.objects.get(id=store_id)
+        store_id = self.context['store_id']
+        if store_id:
+            store = get_object_or_404(Store, id=store_id)
             store.store_name = store_name or store.store_name
             store.store_avatar = store_avatar
             store.custom_url = custom_url
             store.save()
             self.instance = store
-        except:
+        else:
             if not Designer.objects.filter(id=designer_id).exists():
                 raise serializers.ValidationError('designer not found')
             self.instance = Store.objects.create(designer_id=designer_id,
@@ -187,9 +187,52 @@ class SaveStoreSerializer(serializers.ModelSerializer):
 
 
 class StoreSerializer(serializers.ModelSerializer):
+    designer = DesignerMiniSerializer(many=False)
+
     class Meta:
         model = Store
-        exclude = ('designer',)
+        fields = '__all__'
+
+
+# address serializers
+class SaveAddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Address
+        exclude = ('customer',)
+
+    def save(self, **kwargs):
+        customer_id = get_object_or_404(Customer, base_user=self.context['request'].user).id
+        city = self.validated_data.get('city')
+        detail = self.validated_data.get('detail')
+        post_code = self.validated_data.get('post_code')
+        phone_number = self.validated_data.get('phone_number')
+        is_default = self.validated_data.get('is_default')
+        address_id = self.context['address_id']
+        if address_id:
+            address = get_object_or_404(Address, id=address_id)
+            address.city = city
+            address.detail = detail
+            address.post_code = post_code
+            address.phone_number = phone_number
+            address.is_default = is_default
+            address.save()
+            self.instance = address
+        else:
+            if not Customer.objects.filter(id=customer_id).exists():
+                raise serializers.ValidationError('customer not found')
+            self.instance = Address.objects.create(customer_id=customer_id, city=city, detail=detail,
+                                                   post_code=post_code, phone_number=phone_number,
+                                                   is_default=is_default)
+
+            return self.instance
+
+
+class AddressSerializer(serializers.ModelSerializer):
+    customer = CustomerMiniSerializer(many=False)
+
+    class Meta:
+        model = Address
+        fields = '__all__'
 
 
 class ChangePasswordSerializer(serializers.ModelSerializer):

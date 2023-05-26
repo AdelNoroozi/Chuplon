@@ -1,6 +1,6 @@
 from django_filters.rest_framework import FilterSet
 
-from accounts.models import BaseUser, Admin, Designer, PrintProvider
+from accounts.models import BaseUser, Admin, Designer, PrintProvider, Address, Store
 
 
 class BaseUserFilter(FilterSet):
@@ -38,4 +38,22 @@ class ProviderFilter(FilterSet):
         fields = {
             'city': ['exact'],
             'city__state': ['exact']
+        }
+
+
+class AddressFilter(FilterSet):
+    class Meta:
+        model = Address
+        fields = {
+            'customer': ['exact'],
+            'city': ['exact'],
+            'city__state': ['exact']
+        }
+
+
+class StoreFilter(FilterSet):
+    class Meta:
+        model = Store
+        fields = {
+            'designer': ['exact'],
         }
