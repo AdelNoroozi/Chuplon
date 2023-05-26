@@ -1,19 +1,22 @@
 from django.db import transaction
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import mixins, status, viewsets
+from rest_framework import mixins, status
 from rest_framework.decorators import action, api_view, permission_classes
-from rest_framework.exceptions import NotFound, AuthenticationFailed
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.filters import SearchFilter, OrderingFilter
-from rest_framework.generics import CreateAPIView, UpdateAPIView
+from rest_framework.generics import CreateAPIView, UpdateAPIView, get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
-from django.shortcuts import get_object_or_404
+
 from accounts.filters import BaseUserFilter, AdminFilter, DesignerFilter, ProviderFilter, AddressFilter, StoreFilter
-from accounts.models import *
+from accounts.models import BaseUser, Customer, Admin, PrintProvider, Designer, Store, Address
 from accounts.permissons import MappedDjangoModelPermissions, NotAuthenticated, IsSuperUser, StorePermission, \
-    IsAuthenticated, IsCustomer, AddressPermission
-from accounts.serializers import *
+    IsAuthenticated, IsCustomer, IsCustomerOrDesigner
+from accounts.serializers import RegisterCustomerSerializer, BaseUserMiniSerializer, BaseUserSerializer, \
+    AddAdminSerializer, CustomerMiniSerializer, CustomerSerializer, AdminMiniSerializer, AdminSerializer, \
+    AddProviderSerializer, ProviderMiniSerializer, ProviderSerializer, DesignerMiniSerializer, DesignerSerializer, \
+    StoreSerializer, SaveStoreSerializer, ChangePasswordSerializer, AddressSerializer, SaveAddressSerializer
 
 
 class RegisterCustomerView(CreateAPIView):
@@ -226,10 +229,10 @@ class AddressManagerView(mixins.ListModelMixin,
 
 class AddressViewSet(AddressManagerView, mixins.UpdateModelMixin,
                      mixins.DestroyModelMixin, mixins.CreateModelMixin):
-    permission_classes = (AddressPermission,)
+    permission_classes = (IsCustomerOrDesigner,)
 
     def get_queryset(self):
-        customer_id = self.kwargs.get('customer_pk')
+        customer_id = get_object_or_404(Customer, base_user__id=self.request.user.id).id
         customer_addresses = Address.objects.filter(customer_id=customer_id)
         return customer_addresses
 

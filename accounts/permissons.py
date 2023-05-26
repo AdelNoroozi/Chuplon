@@ -30,6 +30,11 @@ class IsCustomer(BasePermission):
         return request.user.role == 'CUS'
 
 
+class IsCustomerOrDesigner(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.role == 'CUS' or request.user.role == 'DES'
+
+
 class IsSuperUser(BasePermission):
     def has_permission(self, request, view):
         return request.user.is_superuser
@@ -56,22 +61,22 @@ class StorePermission(BasePermission):
             return False
         return obj.designer == designer
 
-
-class AddressPermission(BasePermission):
-    def has_permission(self, request, view):
-        if request.method == 'POST':
-            return True
-        user = request.user
-        try:
-            customer = Customer.objects.get(base_user=user)
-        except:
-            return False
-        return str(customer.id) == view.kwargs.get('customer_pk')
-
-    def has_object_permission(self, request, view, obj: Address):
-        user = request.user
-        try:
-            customer = Customer.objects.get(base_user=user)
-        except:
-            return False
-        return obj.customer == customer
+# class AddressPermission(BasePermission):
+#     def has_permission(self, request, view):
+#         if request.method == 'POST':
+#             return True
+#         user = request.user
+#         try:
+#             customer = Customer.objects.get(base_user=user)
+#         except:
+#             return False
+#         # return str(customer.id) == view.kwargs.get('customer_pk')
+#         return True
+#
+#     def has_object_permission(self, request, view, obj: Address):
+#         user = request.user
+#         try:
+#             customer = Customer.objects.get(base_user=user)
+#         except:
+#             return False
+#         return obj.customer == customer

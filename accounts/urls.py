@@ -12,15 +12,13 @@ router.register('providers', ProviderViewSet, basename='providers')
 router.register('designers', DesignerViewSet, basename='designers')
 router.register('stores', StoreManagerView, basename='stores')
 router.register('addresses', AddressManagerView, basename='addresses')
+router.register('my_addresses', AddressViewSet, basename='my_addresses')
 designer_nested_router = NestedDefaultRouter(router, 'designers', lookup='designer')
 designer_nested_router.register('stores', StoreViewSet, basename='stores')
-customer_nested_url = NestedDefaultRouter(router, 'customers', lookup='customer')
-customer_nested_url.register('addresses', AddressViewSet, basename='addresses')
 
 urlpatterns = [
     path('', include(router.urls)),
     path('', include(designer_nested_router.urls)),
-    path('', include(customer_nested_url.urls)),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('register/', RegisterCustomerView.as_view(), name='register'),
