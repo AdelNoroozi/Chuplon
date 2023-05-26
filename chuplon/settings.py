@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     "design",
     "feedback",
     "store",
-    "utils",
+    'utils',
 ]
 
 AUTH_USER_MODEL = 'accounts.BaseUser'
