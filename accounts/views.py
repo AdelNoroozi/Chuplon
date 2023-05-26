@@ -10,7 +10,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from accounts.filters import BaseUserFilter, AdminFilter, DesignerFilter
 from accounts.models import *
-from accounts.permissons import MappedDjangoModelPermissions, NotAuthenticated, IsSuperUser
+from accounts.permissons import MappedDjangoModelPermissions, NotAuthenticated, IsSuperUser, StorePermission
 from accounts.serializers import *
 
 
@@ -157,8 +157,7 @@ class StoreViewSet(viewsets.ModelViewSet):
     queryset = Store.objects.all()
     filter_backends = [SearchFilter, ]
     search_fields = ['store_name', ]
-
-    # permission
+    permission_classes = (StorePermission,)
 
     def get_queryset(self):
         designer_id = self.kwargs.get('designer_pk')

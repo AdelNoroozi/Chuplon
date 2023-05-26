@@ -163,13 +163,13 @@ class SaveStoreSerializer(serializers.ModelSerializer):
 
     def save(self, **kwargs):
         designer_id = self.context['designer_id']
-        store_name = self.validated_data['store_name']
-        store_avatar = self.validated_data['store_avatar']
-        custom_url = self.validated_data['custom_url']
+        store_name = self.validated_data.get('store_name')
+        store_avatar = self.validated_data.get('store_avatar')
+        custom_url = self.validated_data.get('custom_url')
         try:
             store_id = self.context['store_id']
             store = Store.objects.get(id=store_id)
-            store.store_name = store_name
+            store.store_name = store_name or store.store_name
             store.store_avatar = store_avatar
             store.custom_url = custom_url
             store.save()
@@ -177,7 +177,8 @@ class SaveStoreSerializer(serializers.ModelSerializer):
         except:
             if not Designer.objects.filter(id=designer_id).exists():
                 raise serializers.ValidationError('designer not found')
-            self.instance = Store.objects.create(designer_id=designer_id, store_name=store_name,
+            self.instance = Store.objects.create(designer_id=designer_id,
+                                                 store_name=store_name or Store._meta.get_field('store_name').default,
                                                  store_avatar=store_avatar, custom_url=custom_url)
 
         return self.instance
