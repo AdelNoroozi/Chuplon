@@ -10,7 +10,8 @@ from rest_framework.viewsets import GenericViewSet
 
 from accounts.filters import BaseUserFilter, AdminFilter, DesignerFilter
 from accounts.models import *
-from accounts.permissons import MappedDjangoModelPermissions, NotAuthenticated, IsSuperUser, StorePermission
+from accounts.permissons import MappedDjangoModelPermissions, NotAuthenticated, IsSuperUser, StorePermission, \
+    IsAuthenticated
 from accounts.serializers import *
 
 
@@ -195,3 +196,12 @@ class GetUserInfoView(APIView):
             provider = PrintProvider.objects.get(base_user=user)
             serializer = ProviderSerializer(provider)
             return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ChangePasswordView(UpdateAPIView):
+    queryset = BaseUser.objects.all()
+    serializer_class = ChangePasswordSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_object(self):
+        return self.request.user

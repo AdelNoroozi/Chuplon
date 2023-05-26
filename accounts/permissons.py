@@ -20,6 +20,11 @@ class NotAuthenticated(BasePermission):
         return request.user.is_anonymous
 
 
+class IsAuthenticated(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated
+
+
 class IsSuperUser(BasePermission):
     def has_permission(self, request, view):
         return request.user.is_superuser

@@ -1,8 +1,10 @@
 import re
 
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.password_validation import validate_password
 from django.core.validators import EmailValidator
-from rest_framework import serializers
+from rest_framework import serializers, status
+from rest_framework.response import Response
 
 from accounts.models import BaseUser, Customer, Admin, PrintProvider, Designer, Store
 
@@ -188,3 +190,31 @@ class StoreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Store
         exclude = ('designer',)
+
+
+class ChangePasswordSerializer(serializers.ModelSerializer):
+    current_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = BaseUser
+        fields = ('current_password', 'new_password')
+
+    def validate(self, attrs):
+        current_password = attrs.get('current_password')
+        new_password = attrs.get('new_password')
+        if not current_password:
+            raise serializers.ValidationError({'missing field': 'current password'})
+        if not new_password:
+            raise serializers.ValidationError({'missing field': 'new password'})
+        user = self.context['request'].user
+        if not user.check_password(current_password):
+            raise serializers.ValidationError({'invalid fields': 'incorrect password.'})
+        if current_password == new_password:
+            raise serializers.ValidationError({'invalid field': 'old password and new password are the same.'})
+        return attrs
+
+    def update(self, instance, validated_data):
+        instance.password = make_password(validated_data['new_password'])
+        instance.save()
+        return instance

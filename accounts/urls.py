@@ -22,4 +22,5 @@ urlpatterns = [
     path('add-admin/', AddAdminView.as_view(), name='add_admin'),
     path('add-provider/', AddProviderView.as_view(), name='add_admin'),
     path('get_my_info/', GetUserInfoView.as_view(), name='get_user_info'),
+    path('change_password/', ChangePasswordView.as_view(), name='change_password'),
 ]
