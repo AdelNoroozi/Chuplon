@@ -8,6 +8,8 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from utils.models import State, City
+
 
 class UserManager(BaseUserManager):
     def create_user(self, username, password=None, first_name=None, last_name=None, email=None, phone_number=None):
@@ -211,8 +213,7 @@ class PrintProvider(models.Model):
     name = models.CharField(max_length=50, default='unknown provider', verbose_name=_('name'))
     description = models.TextField(blank=True, null=True, verbose_name=_('description'))
     rate = models.IntegerField(default=0, blank=True, null=True, verbose_name=_('rate'))
-    # state
-    # city
+    city = models.ForeignKey(City, on_delete=models.RESTRICT, related_name='providers', verbose_name=_('city'))
     address_detail = models.TextField(max_length=500, blank=True, null=True, verbose_name=_('address detail'))
     post_code = models.BigIntegerField(blank=True, null=True, verbose_name=_('post code'))
     office_number = models.CharField(max_length=200, blank=True, null=True, verbose_name=_('office number'))

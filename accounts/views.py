@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
-from accounts.filters import BaseUserFilter, AdminFilter, DesignerFilter
+from accounts.filters import BaseUserFilter, AdminFilter, DesignerFilter, ProviderFilter
 from accounts.models import *
 from accounts.permissons import MappedDjangoModelPermissions, NotAuthenticated, IsSuperUser, StorePermission, \
     IsAuthenticated
@@ -113,7 +113,10 @@ class ProviderViewSet(mixins.ListModelMixin,
                       mixins.RetrieveModelMixin,
                       GenericViewSet):
     queryset = PrintProvider.objects.all()
-    # filters
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_class = ProviderFilter
+    search_fields = ['name', ]
+    ordering_fields = ['rate', ]
     permission_classes = (MappedDjangoModelPermissions,)
 
     def get_serializer_class(self):

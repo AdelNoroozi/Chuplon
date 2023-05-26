@@ -1,6 +1,6 @@
 from django_filters.rest_framework import FilterSet
 
-from accounts.models import BaseUser, Admin, Designer
+from accounts.models import BaseUser, Admin, Designer, PrintProvider
 
 
 class BaseUserFilter(FilterSet):
@@ -29,4 +29,13 @@ class DesignerFilter(FilterSet):
             'is_premium': ['exact'],
             'promotion_date': ['gt', 'lt'],
             'balance': ['gt', 'lt']
+        }
+
+
+class ProviderFilter(FilterSet):
+    class Meta:
+        model = PrintProvider
+        fields = {
+            'city': ['exact'],
+            'city__state': ['exact']
         }
