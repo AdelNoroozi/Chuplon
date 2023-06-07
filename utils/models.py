@@ -31,3 +31,26 @@ class City(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Size(models.Model):
+    text = models.CharField(max_length=20, verbose_name=_('text'))
+
+    class Meta:
+        verbose_name = 'Size'
+        verbose_name_plural = 'Sizes'
+
+    def __str__(self):
+        return self.text
+
+
+class Color(models.Model):
+    name = models.CharField(max_length=20, verbose_name=_('name'))
+    code = models.CharField(max_length=20, verbose_name=_('code'))
+
+    class Meta:
+        verbose_name = 'Color'
+        verbose_name_plural = 'Colors'
+
+    def __str__(self):
+        return f' {self.name} - {self.code} '
