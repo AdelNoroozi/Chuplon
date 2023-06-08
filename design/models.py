@@ -48,8 +48,8 @@ class BlankProductFilterablePropValue(models.Model):
 class BlankProduct(models.Model):
     title = models.CharField(max_length=20, verbose_name=_('title'))
     desc = models.TextField(max_length=100, verbose_name=_('desc'))
-    props = models.ManyToManyField(BlankProductFilterablePropValue, related_name='blank_products', verbose_name='props')
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='blank_products', verbose_name='category')
+    props = models.ManyToManyField(BlankProductFilterablePropValue, related_name='blank_products', verbose_name=_('props'))
+    category = models.ForeignKey(Category, on_delete=models.RESTRICT, related_name='blank_products', verbose_name=_('category'))
 
     class Meta:
         verbose_name = 'Blank Product'
@@ -60,7 +60,7 @@ class BlankProduct(models.Model):
 
 
 class BlankProductUnfilterableProp(models.Model):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='blank_product_unfilterable_props', verbose_name='category')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='blank_product_unfilterable_props', verbose_name=_('category'))
     name = models.CharField(max_length=50, verbose_name=_('name'))
 
     class Meta:
@@ -72,8 +72,8 @@ class BlankProductUnfilterableProp(models.Model):
 
 
 class BlankProductUnfilterablePropValue(models.Model):
-    blank_product = models.ForeignKey(BlankProduct, on_delete=models.CASCADE, related_name='blank_product_unfilterable_prop_values', verbose_name='blank product')
-    prop = models.ForeignKey(BlankProductUnfilterableProp, on_delete=models.CASCADE, related_name='blank_product_unfilterable_prop_values', verbose_name='prop')
+    blank_product = models.ForeignKey(BlankProduct, on_delete=models.CASCADE, related_name='blank_product_unfilterable_prop_values', verbose_name=_('blank product'))
+    prop = models.ForeignKey(BlankProductUnfilterableProp, on_delete=models.CASCADE, related_name='blank_product_unfilterable_prop_values', verbose_name=_('prop'))
     value = models.CharField(max_length=10, verbose_name=_('value'))
 
     class Meta:
@@ -95,7 +95,7 @@ class BlankProductImage(models.Model):
         verbose_name_plural = 'Blank Product Images'
 
     def __str__(self):
-        return self.blank_product
+        return self.blank_product.title
 
 
 class BlankProductSampleImage(models.Model):
@@ -112,7 +112,7 @@ class BlankProductSampleImage(models.Model):
 
 class BlankProductProviderProp(models.Model):
     blank_product = models.ForeignKey(BlankProduct, on_delete=models.CASCADE, related_name='blank_product_provider_props', verbose_name=_('blank product'))
-    provider = models.ForeignKey(PrintProvider, on_delete=models.SET_NULL, null=True, related_name='blank-product-provider_props', verbose_name=_('provider'))
+    provider = models.ForeignKey(PrintProvider, on_delete=models.RESTRICT, related_name='blank-product-provider_props', verbose_name=_('provider'))
     price = models.CharField(max_length=10, verbose_name=_('price'))
     prep_time = models.CharField(max_length=10, verbose_name=_('prep time'))
 
@@ -126,8 +126,8 @@ class BlankProductProviderProp(models.Model):
 
 class BlankProductProviderPropDetail(models.Model):
     blankProductProviderProp = models.ForeignKey(BlankProductProviderProp, on_delete=models.CASCADE, related_name='blank_product_provider_prop_details', verbose_name=_('blank product provider prop'))
-    color = models.ForeignKey(Color, on_delete=models.SET_NULL, null=True, related_name='blank_product_provider_prop_details', verbose_name=_('color'))
-    size = models.ForeignKey(Size, on_delete=models.SET_NULL, null=True, related_name='blank_product_provider_prop_details', verbose_name=_('price'))
+    color = models.ForeignKey(Color, on_delete=models.RESTRICT, related_name='blank_product_provider_prop_details', verbose_name=_('color'))
+    size = models.ForeignKey(Size, on_delete=models.RESTRICT, related_name='blank_product_provider_prop_details', verbose_name=_('price'))
     price = models.CharField(max_length=10, verbose_name=_('price'))
 
     class Meta:
