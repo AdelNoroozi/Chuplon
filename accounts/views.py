@@ -5,6 +5,7 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.generics import CreateAPIView, UpdateAPIView, get_object_or_404
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
@@ -34,6 +35,7 @@ class BaseUserViewSet(mixins.ListModelMixin,
     filterset_class = BaseUserFilter
     search_fields = ['phone_number', 'first_name', 'last_name', 'username', 'email', ]
     ordering_fields = ['date_joined']
+    pagination_class = PageNumberPagination
 
     def get_queryset(self):
         if self.request.user.is_superuser:
@@ -82,6 +84,7 @@ class CustomerViewSet(mixins.ListModelMixin,
                       GenericViewSet):
     queryset = Customer.objects.all()
     permission_classes = (MappedDjangoModelPermissions,)
+    pagination_class = PageNumberPagination
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -97,6 +100,7 @@ class AdminViewSet(mixins.ListModelMixin,
     filter_backends = [DjangoFilterBackend]
     filterset_class = AdminFilter
     permission_classes = (IsSuperUser,)
+    pagination_class = PageNumberPagination
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -118,6 +122,7 @@ class ProviderViewSet(mixins.ListModelMixin,
     search_fields = ['name', ]
     ordering_fields = ['rate', ]
     permission_classes = (MappedDjangoModelPermissions,)
+    pagination_class = PageNumberPagination
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -134,6 +139,7 @@ class DesignerViewSet(mixins.ListModelMixin,
     filterset_class = DesignerFilter
     ordering_fields = ['promotion_date', 'balance']
     permission_classes = (MappedDjangoModelPermissions,)
+    pagination_class = PageNumberPagination
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -163,6 +169,7 @@ class StoreManagerView(mixins.ListModelMixin,
     filterset_class = StoreFilter
     search_fields = ['store_name', ]
     permission_classes = (MappedDjangoModelPermissions,)
+    pagination_class = PageNumberPagination
 
 
 class StoreViewSet(StoreManagerView, mixins.UpdateModelMixin,
@@ -225,6 +232,7 @@ class AddressManagerView(mixins.ListModelMixin,
     filterset_class = AddressFilter
     search_fields = ['detail', 'phone_number']
     permission_classes = (MappedDjangoModelPermissions,)
+    pagination_class = PageNumberPagination
 
 
 class AddressViewSet(AddressManagerView, mixins.UpdateModelMixin,
