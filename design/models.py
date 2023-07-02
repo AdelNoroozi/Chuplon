@@ -112,7 +112,7 @@ class BlankProductSampleImage(models.Model):
 
 class BlankProductProviderProp(models.Model):
     blank_product = models.ForeignKey(BlankProduct, on_delete=models.CASCADE, related_name='blank_product_provider_props', verbose_name=_('blank product'))
-    provider = models.ForeignKey(PrintProvider, on_delete=models.SET_NULL, null=True, related_name='blank-product-provider_props', verbose_name=_('provider'))
+    provider = models.ForeignKey(PrintProvider, on_delete=models.SET_NULL, null=True, related_name='blank_product_provider_props', verbose_name=_('provider'))
     price = models.CharField(max_length=10, verbose_name=_('price'))
     prep_time = models.CharField(max_length=10, verbose_name=_('prep time'))
 
