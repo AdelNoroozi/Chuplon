@@ -134,5 +134,5 @@ class BlankProductProviderPropDetail(models.Model):
         verbose_name = 'Blank Product Provider Prop Detail'
         verbose_name_plural = 'Blank Product Provider Prop Details'
 
-    def __str__(self):
-        return self.blankProductProviderProp
+    # def __str__(self): todo
+    #     # return self.blankProductProviderProp.blank_product
