@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Category, BlankProduct, BlankProductProviderProp
+from .models import *
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -20,7 +20,7 @@ class BlankProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BlankProduct
-        fields = ("id","title", "desc", "props", "category", "average_price")
+        fields = ("id", "title", "desc", "props", "category", "average_price")
 
     def get_average_price(self, obj):
         prices = BlankProductProviderProp.objects.filter(blank_product_id=obj.id).values("price")
@@ -30,3 +30,9 @@ class BlankProductSerializer(serializers.ModelSerializer):
         average_price /= len(prices)
 
         return average_price
+
+
+class BlankProductUnfilterablePropSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BlankProductFilterableProp
+        fields = "__all__"
