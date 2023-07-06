@@ -56,3 +56,11 @@ class BlankProductFilterablePropValueSerializer(serializers.ModelSerializer):
     class Meta:
         model = BlankProductFilterablePropValue
         fields = ("id", "prop", "value")
+
+class BlankProductProviderPropSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BlankProductProviderProp
+        fields = "__all__"
+
+
+
