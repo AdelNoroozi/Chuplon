@@ -1,7 +1,7 @@
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
 from .models import Category, BlankProduct
-from .serializers import CategorySerializer, BlankProductSerializer
+from .serializers import CategorySerializer, BlankProductSerializer, BlankProductRetrieveSerializer
 
 
 class ListCategoryAPI(ListAPIView):
@@ -17,3 +17,8 @@ class RetrieveCategoryAPI(RetrieveAPIView):
 class ListBLankProductAPI(ListAPIView):
     queryset = BlankProduct.objects.all()
     serializer_class = BlankProductSerializer
+
+
+class RetrieveBLankProductAPI(RetrieveAPIView):
+    queryset = BlankProduct.objects.all()
+    serializer_class = BlankProductRetrieveSerializer
