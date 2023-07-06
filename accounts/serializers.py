@@ -140,6 +140,12 @@ class ProviderMiniSerializer(AbstractUserTypeMiniSerializer):
         fields = ('id', 'base_user', 'name')
 
 
+class ProviderBlankProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PrintProvider
+        fields = ("id", "name", "city")
+
+
 # designer serializers
 class DesignerSerializer(AbstractUserTypeSerializer):
     base_user = None

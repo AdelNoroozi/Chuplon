@@ -1,4 +1,6 @@
 from rest_framework import serializers
+
+from accounts.serializers import ProviderSerializer, ProviderMiniSerializer, ProviderBlankProductSerializer
 from .models import *
 
 
@@ -20,7 +22,7 @@ class BlankProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BlankProduct
-        fields = ("id", "title", "desc", "props", "category", "average_price")
+        fields = ("id", "title", "category", "average_price")
 
     def get_average_price(self, obj):
         prices = BlankProductProviderProp.objects.filter(
@@ -41,28 +43,38 @@ class BlankProductUnfilterablePropSerializer(serializers.ModelSerializer):
 
 
 class BlankProductUnfilterablePropValueSerializer(serializers.ModelSerializer):
-    prop = BlankProductUnfilterablePropSerializer()
+    prop = serializers.CharField(source="prop.name")
 
     class Meta:
         model = BlankProductUnfilterablePropValue
         fields = ("id", "prop", "value")
 
 
-class BlankProductFilterablePropSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BlankProductFilterableProp
-        fields = ("id", "name")
-
-
 class BlankProductFilterablePropValueSerializer(serializers.ModelSerializer):
-    prop = BlankProductFilterablePropSerializer()
+    prop = serializers.CharField(source="prop.name")
 
     class Meta:
         model = BlankProductFilterablePropValue
         fields = ("id", "prop", "value")
 
 
+class FilterColumnSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BlankProductFilterableProp
+        fields = ("id", "name")
+
+
+class CategoryRetrieveSerializer(serializers.ModelSerializer):
+    blank_product_filterable_props = FilterColumnSerializer(many=True)
+
+    class Meta:
+        model = Category
+        fields = ("id", "name", "blank_product_filterable_props")
+
+
 class BlankProductProviderPropSerializer(serializers.ModelSerializer):
+    provider = ProviderBlankProductSerializer(many=False)
+
     class Meta:
         model = BlankProductProviderProp
         fields = ("id", "provider", "price", "prep_time")
@@ -76,10 +88,17 @@ class BlankProductProviderPropDetailSerializer(serializers.ModelSerializer):
         fields = ("blankProductProviderProp", "color", "size", "price")
 
 
+class BlankProductImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BlankProductImage
+        exclude = ("blank_product",)
+
+
 class BlankProductRetrieveSerializer(serializers.ModelSerializer):
-    non_filterable_props = serializers.SerializerMethodField()
-    filterable_props = serializers.SerializerMethodField()
-    provider_prop_details = serializers.SerializerMethodField()
+    blank_product_unfilterable_prop_values = BlankProductUnfilterablePropValueSerializer(many=True)
+    props = BlankProductFilterablePropValueSerializer(many=True)
+    blank_product_provider_props = BlankProductProviderPropSerializer(many=True)
+    blank_product_images = BlankProductImageSerializer(many=True)
 
     class Meta:
         model = BlankProduct
@@ -88,29 +107,8 @@ class BlankProductRetrieveSerializer(serializers.ModelSerializer):
             "title",
             "desc",
             "category",
-            "non_filterable_props",
-            "filterable_props",
-            "provider_prop_details",
+            "props",
+            "blank_product_unfilterable_prop_values",
+            "blank_product_provider_props",
+            "blank_product_images",
         )
-
-    def get_non_filterable_props(self, obj):
-        props = BlankProductUnfilterablePropValue.objects.filter(
-            blank_product_id=obj.id
-        )
-        return BlankProductUnfilterablePropValueSerializer(props, many=True).data
-
-    def get_filterable_props(self, obj):
-        props = obj.props.all()
-        return BlankProductFilterablePropValueSerializer(props, many=True).data
-
-    def get_provider_prop_details(self, obj):
-        provider_prop = BlankProductProviderProp.objects.filter(
-            blank_product_id=obj.id
-        ).first()
-        provider_prop_detail = BlankProductProviderPropDetail.objects.filter(
-            blankProductProviderProp_id=provider_prop.id
-        )
-
-        return BlankProductProviderPropDetailSerializer(
-            provider_prop_detail, many=True
-        ).data
