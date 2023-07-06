@@ -20,7 +20,7 @@ class BlankProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BlankProduct
-        fields = ("title", "desc", "props", "category", "average_price")
+        fields = ("id","title", "desc", "props", "category", "average_price")
 
     def get_average_price(self, obj):
         prices = BlankProductProviderProp.objects.filter(blank_product_id=obj.id).values("price")
