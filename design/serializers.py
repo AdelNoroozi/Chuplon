@@ -45,10 +45,12 @@ class BlankProductUnfilterablePropValueSerializer(serializers.ModelSerializer):
         model = BlankProductUnfilterablePropValue
         fields = ("id", "blank_product", "prop", "value")
 
+
 class BlankProductFilterablePropSerializer(serializers.ModelSerializer):
     class Meta:
         model = BlankProductFilterableProp
         fields = "__all__"
+
 
 class BlankProductFilterablePropValueSerializer(serializers.ModelSerializer):
     prop = BlankProductFilterablePropSerializer()
@@ -57,10 +59,19 @@ class BlankProductFilterablePropValueSerializer(serializers.ModelSerializer):
         model = BlankProductFilterablePropValue
         fields = ("id", "prop", "value")
 
+
 class BlankProductProviderPropSerializer(serializers.ModelSerializer):
     class Meta:
         model = BlankProductProviderProp
         fields = "__all__"
+
+
+class BlankProductProviderPropDetailSerializer(serializers.ModelSerializer):
+    blankProductProviderProp = BlankProductProviderPropSerializer()
+
+    class Meta:
+        model = BlankProductProviderPropDetail
+        fields = ("blankProductProviderProp", "color", "size", "price")
 
 
 
