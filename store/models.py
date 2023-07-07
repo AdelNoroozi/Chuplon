@@ -24,6 +24,14 @@ class Discount(models.Model):
         related_name='orders',
         verbose_name=_('customer')
     )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_('created at')
+    )
+    modified_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name=_('modified at')
+    )
 
     class Meta:
         verbose_name = 'Discount'
@@ -75,6 +83,14 @@ class Order(models.Model):
     post_tracking_code = models.CharField(  # TODO
         max_length=20,
         verbose_name=_('post_tracking_code')
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_('created at')
+    )
+    modified_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name=_('modified at')
     )
 
     class Meta:
