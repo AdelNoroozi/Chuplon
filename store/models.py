@@ -68,7 +68,6 @@ class Order(models.Model):
         related_name='orders',
         verbose_name=_('address')
     )
-
     status_choice = (
         ('REQ', _('requested')),
         ('CNL', _('canceled')),
@@ -141,3 +140,42 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f'{self.order} - {self.product}'
+
+
+class Payment(models.Model):
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        blank=True,
+        related_name='order-items',
+        verbose_name=_('order')
+    )
+    type_choice = (
+        ('INC ', _('income')),
+        ('RTN', _('return')),
+        ('WDL', _('withdrawal')),
+    )
+    type = models.CharField(
+        choices=type_choice,
+        max_length=20,
+        verbose_name=_('type')
+    )
+    receipt_file = models.CharField(  # TODO ??
+        max_length=10,
+        verbose_name=_('receipt_file')
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_('created at')
+    )
+    modified_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name=_('modified at')
+    )
+
+    class Meta:
+        verbose_name = 'Payment'
+        verbose_name_plural = 'Payments'
+
+    def __str__(self):
+        return f'{self.order} - {self.type}'
