@@ -197,21 +197,8 @@ class GetUserInfoView(APIView):
         if not request.user.is_authenticated:
             raise AuthenticationFailed('not authenticated')
         user = request.user
-        if user.is_staff:
-            serializer = BaseUserSerializer(user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        if user.role == 'CUS':
-            customer = Customer.objects.get(base_user=user)
-            serializer = CustomerSerializer(customer)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        if user.role == 'DES':
-            designer = Designer.objects.get(customer_object__base_user=user)
-            serializer = DesignerSerializer(designer)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        if user.role == 'PRP':
-            provider = PrintProvider.objects.get(base_user=user)
-            serializer = ProviderSerializer(provider)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = BaseUserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ChangePasswordView(UpdateAPIView):

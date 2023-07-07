@@ -1,12 +1,12 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter
-from rest_framework.generics import ListAPIView, RetrieveAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView
 from rest_framework.pagination import PageNumberPagination
 
 from .filters import BlankProductFilter
-from .models import Category, BlankProduct
+from .models import Category, BlankProduct, BlankProductImage
 from .serializers import CategorySerializer, BlankProductSerializer, BlankProductRetrieveSerializer, \
-    CategoryRetrieveSerializer
+    CategoryRetrieveSerializer, BlankProductImageSerializer
 
 
 class ListCategoryAPI(ListAPIView):
@@ -30,3 +30,5 @@ class ListBLankProductAPI(ListAPIView):
 class RetrieveBLankProductAPI(RetrieveAPIView):
     queryset = BlankProduct.objects.all()
     serializer_class = BlankProductRetrieveSerializer
+
+

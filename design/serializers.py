@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from accounts.serializers import ProviderSerializer, ProviderMiniSerializer, ProviderBlankProductSerializer
+from accounts.serializers import ProviderBlankProductSerializer
 from .models import *
 
 
@@ -18,12 +18,13 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class BlankProductSerializer(serializers.ModelSerializer):
-    previews = serializers.SerializerMethodField()
+    preview = serializers.SerializerMethodField(method_name="get_preview")
+
     average_price = serializers.SerializerMethodField()
 
     class Meta:
         model = BlankProduct
-        fields = ("id", "title", "category", "average_price", "previews")
+        fields = ("id", "title", "category", "average_price")
 
     def get_average_price(self, obj):
         prices = BlankProductProviderProp.objects.filter(
@@ -36,9 +37,11 @@ class BlankProductSerializer(serializers.ModelSerializer):
 
         return average_price
 
-    def get_previews(self, obj):
-        images = BlankProductImage.objects.filter(blank_product_id=obj.id, is_preview=True)
-        return BlankProductImageSerializer(images, many=True).data
+    def get_preview(self, obj):
+        if not BlankProductImage.objects.filter(blank_product=obj, is_preview=True).exists():
+            return None
+        images = BlankProductImage.objects.filter(blank_product=obj, is_preview=True).first()
+        return BlankProductImageSerializer(images, many=False).data
 
 
 class BlankProductUnfilterablePropSerializer(serializers.ModelSerializer):
@@ -63,10 +66,19 @@ class BlankProductFilterablePropValueSerializer(serializers.ModelSerializer):
         fields = ("id", "prop", "value")
 
 
+class BlankProductFilterablePropValueMiniSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = BlankProductFilterablePropValue
+        fields = ("id", "value")
+
+
 class FilterColumnSerializer(serializers.ModelSerializer):
+    blank_product_filterable_prop_values = BlankProductFilterablePropValueMiniSerializer(many=True)
+
     class Meta:
         model = BlankProductFilterableProp
-        fields = ("id", "name")
+        fields = ("id", "name", "blank_product_filterable_prop_values")
 
 
 class CategoryRetrieveSerializer(serializers.ModelSerializer):

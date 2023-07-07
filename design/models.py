@@ -1,13 +1,14 @@
-from django.db import models
-from mptt.models import MPTTModel, TreeForeignKey
 from django.utils.translation import gettext_lazy as _
-from utils.models import *
+from mptt.models import MPTTModel, TreeForeignKey
+
 from accounts.models import PrintProvider
+from utils.models import *
 
 
 class Category(MPTTModel):
     name = models.CharField(max_length=20, unique=True, verbose_name=_('name'))
-    parent = TreeForeignKey("self", on_delete=models.CASCADE, null=True, blank=True, related_name='children', verbose_name=_('parent'))
+    parent = TreeForeignKey("self", on_delete=models.CASCADE, null=True, blank=True, related_name='children',
+                            verbose_name=_('parent'))
     is_active = models.BooleanField(default=False, verbose_name=_('is active'))
 
     class Meta:
@@ -95,7 +96,7 @@ class BlankProductImage(models.Model):
         verbose_name_plural = 'Blank Product Images'
 
     def __str__(self):
-        return self.blank_product
+        return self.blank_product.title
 
 
 class BlankProductSampleImage(models.Model):
@@ -107,7 +108,7 @@ class BlankProductSampleImage(models.Model):
         verbose_name_plural = 'Blank Product Sample Images'
 
     def __str__(self):
-        return self.blank_product
+        return self.blank_product.title
 
 
 class BlankProductProviderProp(models.Model):
