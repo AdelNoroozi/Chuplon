@@ -42,3 +42,15 @@ class OrderItemAdmin(admin.ModelAdmin):
 
     )
     search_fields = ("order", "product",)
+
+
+@admin.register(Payment)
+class PaymentAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "order",
+        "type",
+        "receipt_file",
+
+    )
+    search_fields = ("order", "type",)
