@@ -128,6 +128,10 @@ class OrderItem(models.Model):
         related_name='order-items',
         verbose_name=_('size')
     )
+    quantity = models.CharField(
+        max_length=10,
+        verbose_name=_('quantity')
+    )
 
     class Meta:
         verbose_name = 'Order Item'
