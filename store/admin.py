@@ -30,3 +30,15 @@ class OrderAdmin(admin.ModelAdmin):
     search_fields = ("customer", "status", "post_tracking_code",)
 
 
+@admin.register(OrderItem)
+class OrderItemAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "order",
+        "product",
+        "color",
+        "size",
+        "quantity",
+
+    )
+    search_fields = ("order", "product",)
