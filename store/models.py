@@ -125,6 +125,8 @@ class OrderItem(models.Model):
     size = models.ForeignKey(
         Size,
         on_delete=models.RESTRICT,
+        blank=True,
+        null=True,
         related_name='order-items',
         verbose_name=_('size')
     )
