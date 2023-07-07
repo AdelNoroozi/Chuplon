@@ -87,6 +87,7 @@ class BlankProductRetrieveSerializer(serializers.ModelSerializer):
             "id",
             "title",
             "desc",
+            "props",
             "category",
             "non_filterable_props",
             "filterable_props",
@@ -114,3 +115,16 @@ class BlankProductRetrieveSerializer(serializers.ModelSerializer):
         return BlankProductProviderPropDetailSerializer(
             provider_prop_detail, many=True
         ).data
+
+
+class CategoryListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = (
+            "id",
+            "name",
+            "parent",
+            "is_active",
+        )
+
+

@@ -4,17 +4,17 @@ from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.pagination import PageNumberPagination
 
 from .models import Category, BlankProduct
-from .serializers import CategorySerializer, BlankProductSerializer, BlankProductRetrieveSerializer
+from .serializers import CategoryListSerializer, BlankProductSerializer, BlankProductRetrieveSerializer
 
 
 class ListCategoryAPI(ListAPIView):
     queryset = Category.objects.all()
-    serializer_class = CategorySerializer
+    serializer_class = CategoryListSerializer
 
 
 class RetrieveCategoryAPI(RetrieveAPIView):
     queryset = Category.objects.all()
-    serializer_class = CategorySerializer
+    serializer_class = CategoryListSerializer
 
 
 class ListBLankProductAPI(ListAPIView):
