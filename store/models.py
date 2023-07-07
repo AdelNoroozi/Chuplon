@@ -1,6 +1,8 @@
 from django.db import models
 from accounts.models import *
 from django.utils.translation import gettext_lazy as _
+from design.models import *
+from utils.models import *
 
 
 class Discount(models.Model):
@@ -17,7 +19,7 @@ class Discount(models.Model):
         verbose_name=_('percentage')
     )
     specific_user = models.ForeignKey(
-        BaseUser,  # TODO
+        Customer,  # TODO
         blank=True,
         null=True,
         on_delete=models.CASCADE,
@@ -99,3 +101,37 @@ class Order(models.Model):
 
     def __str__(self):
         return f'{self.customer} - {self.total_price}$ " status : {self.status}'
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        related_name='order-items',
+        verbose_name=_('order')
+    )
+    product = models.ForeignKey(
+        BlankProduct,  # TODO it's product
+        on_delete=models.CASCADE,  # TODO models.DO_NOTHING ?
+        related_name='order-items',
+        verbose_name=_('product')
+    )
+    color = models.ForeignKey(
+        Color,
+        on_delete=models.RESTRICT,
+        related_name='order-items',
+        verbose_name=_('color')
+    )
+    size = models.ForeignKey(
+        Size,
+        on_delete=models.RESTRICT,
+        related_name='order-items',
+        verbose_name=_('size')
+    )
+
+    class Meta:
+        verbose_name = 'Order Item'
+        verbose_name_plural = 'Order Items'
+
+    def __str__(self):
+        return f'{self.order} - {self.product}'
