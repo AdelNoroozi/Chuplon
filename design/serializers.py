@@ -128,3 +128,13 @@ class CategoryListSerializer(serializers.ModelSerializer):
         )
 
 
+class CategoryRetrieveSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = (
+            "id",
+            "name",
+            "parent",
+            "is_active",
+        )
+    # TODO funcs
