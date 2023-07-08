@@ -102,7 +102,12 @@ class BlankProductProviderPropSerializer(serializers.ModelSerializer):
             blankProductProviderProp=obj)
         colors = []
         for blank_product_provider_prop_detail in blank_product_provider_prop_details:
-            colors.append(blank_product_provider_prop_detail.color.code)
+            color = {
+                "id": blank_product_provider_prop_detail.color.id,
+                "code": blank_product_provider_prop_detail.color.code
+            }
+            colors.append(color)
+
         return colors
 
     def get_sizes(self, obj):
