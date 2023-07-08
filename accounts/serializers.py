@@ -143,7 +143,7 @@ class ProviderMiniSerializer(AbstractUserTypeMiniSerializer):
 class ProviderBlankProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = PrintProvider
-        fields = ("id", "name", "city")
+        fields = ("id", "name", "address_detail")
 
 
 # designer serializers
