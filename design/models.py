@@ -128,7 +128,7 @@ class BlankProductProviderProp(models.Model):
 class BlankProductProviderPropDetail(models.Model):
     blankProductProviderProp = models.ForeignKey(BlankProductProviderProp, on_delete=models.CASCADE, related_name='blank_product_provider_prop_details', verbose_name=_('blank product provider prop'))
     color = models.ForeignKey(Color, on_delete=models.SET_NULL, null=True, related_name='blank_product_provider_prop_details', verbose_name=_('color'))
-    size = models.ForeignKey(Size, on_delete=models.SET_NULL, null=True, related_name='blank_product_provider_prop_details', verbose_name=_('price'))
+    size = models.ForeignKey(Size, on_delete=models.SET_NULL, null=True, related_name='blank_product_provider_prop_details', verbose_name=_('size'))
     price = models.CharField(max_length=10, verbose_name=_('price'))
 
     class Meta:

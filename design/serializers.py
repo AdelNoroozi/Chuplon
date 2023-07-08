@@ -90,10 +90,18 @@ class CategoryRetrieveSerializer(serializers.ModelSerializer):
 
 class BlankProductProviderPropSerializer(serializers.ModelSerializer):
     provider = ProviderBlankProductSerializer(many=False)
+    colors = serializers.SerializerMethodField()
 
     class Meta:
         model = BlankProductProviderProp
-        fields = ("id", "provider", "price", "prep_time")
+        fields = ("id", "provider", "price", "prep_time", "colors")
+
+    def get_colors(self, obj):
+        blank_product_provider_prop_details = BlankProductProviderPropDetail.objects.filter(
+            blankProductProviderProp=obj)
+        colors = []
+        for blank_product_provider_prop_detail in blank_product_provider_prop_details:
+            colors.append(blank_product_provider_prop_detail.color.code)
 
 
 class BlankProductProviderPropDetailSerializer(serializers.ModelSerializer):
