@@ -3,7 +3,6 @@ import re
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -159,7 +158,8 @@ class Designer(models.Model):
 
     customer_object = models.OneToOneField(Customer, on_delete=models.CASCADE, related_name='designer',
                                            verbose_name=_('customer object'))
-    card_number = models.CharField(max_length=20, validators=[card_number_validator], verbose_name=_('card number'))
+    card_number = models.CharField(max_length=20, blank=True, null=True, validators=[card_number_validator],
+                                   verbose_name=_('card number'))
     is_premium = models.BooleanField(default=False, verbose_name=_('is premium'))
     balance = models.FloatField(default=0, verbose_name=_('balance'))
     promotion_date = models.DateTimeField(auto_now_add=True, verbose_name=_('promotion date'))

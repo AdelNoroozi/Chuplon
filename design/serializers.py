@@ -19,12 +19,11 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class BlankProductSerializer(serializers.ModelSerializer):
     preview = serializers.SerializerMethodField(method_name="get_preview")
-
     average_price = serializers.SerializerMethodField()
 
     class Meta:
         model = BlankProduct
-        fields = ("id", "title", "category", "average_price")
+        fields = ("id", "title", "category", "average_price", "preview",)
 
     def get_average_price(self, obj):
         prices = BlankProductProviderProp.objects.filter(

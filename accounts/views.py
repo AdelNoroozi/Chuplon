@@ -247,12 +247,12 @@ class AddressViewSet(AddressManagerView, mixins.UpdateModelMixin,
 @permission_classes([IsCustomer])
 def promote_customer_to_designer(request):
     user = request.user
-    card_number = request.data.get('card_number')
-    if card_number is None:
-        response = {'missing field': 'card number'}
-        return Response(response, status=status.HTTP_400_BAD_REQUEST)
+    # card_number = request.data.get('card_number')
+    # if card_number is None:
+    #     response = {'missing field': 'card number'}
+    #     return Response(response, status=status.HTTP_400_BAD_REQUEST)
     user.role = 'DES'
     user.save()
-    designer = Designer.objects.create(card_number=card_number, customer_object=Customer.objects.get(base_user=user))
+    designer = Designer.objects.create(customer_object=Customer.objects.get(base_user=user))
     serializer = DesignerSerializer(designer)
     return Response(serializer.data, status=status.HTTP_200_OK)
