@@ -24,7 +24,6 @@ class ListBLankProductAPI(ListAPIView):
     serializer_class = BlankProductSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = BlankProductFilter
-    pagination_class = PageNumberPagination
 
 
 class RetrieveBLankProductAPI(RetrieveAPIView):
